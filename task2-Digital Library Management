@@ -1,0 +1,125 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+public class Main {
+    private List<Book> books;
+    private Scanner scanner;
+
+    // Constructor for Main class
+    public Main() {
+        this.books = new ArrayList<>();
+        this.scanner = new Scanner(System.in);
+    }
+
+    public void run() {
+        System.out.println("Welcome to Digital Library Management System!");
+
+        while (true) {
+            System.out.println("\n1. Add Book");
+            System.out.println("2. Display All Books");
+            System.out.println("3. Search Book by Title");
+            System.out.println("4. Exit");
+            System.out.print("Enter your choice: ");
+
+            int choice = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
+
+            switch (choice) {
+                case 1:
+                    addBook();
+                    break;
+                case 2:
+                    displayAllBooks();
+                    break;
+                case 3:
+                    searchBookByTitle();
+                    break;
+                case 4:
+                    System.out.println("Exiting...");
+                    scanner.close();
+                    return;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+    }
+
+    private void addBook() {
+        System.out.print("Enter book title: ");
+        String title = scanner.nextLine();
+        System.out.print("Enter author name: ");
+        String author = scanner.nextLine();
+        System.out.print("Enter category: ");
+        String category = scanner.nextLine();
+
+        Book newBook = new Book(title, author, category);
+        books.add(newBook);
+
+        System.out.println("Book added successfully!");
+    }
+
+    private void displayAllBooks() {
+        if (books.isEmpty()) {
+            System.out.println("No books available in the library.");
+        } else {
+            System.out.println("List of Books:");
+            for (Book book : books) {
+                System.out.println(book);
+            }
+        }
+    }
+
+    private void searchBookByTitle() {
+        System.out.print("Enter book title to search: ");
+        String searchTitle = scanner.nextLine();
+
+        boolean found = false;
+        for (Book book : books) {
+            if (book.getTitle().equalsIgnoreCase(searchTitle)) {
+                System.out.println("Book found:");
+                System.out.println(book);
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            System.out.println("Book with title '" + searchTitle + "' not found.");
+        }
+    }
+
+    public static void main(String[] args) {
+        Main librarySystem = new Main(); // Create an instance of Main class
+        librarySystem.run(); // Start the library system
+    }
+}
+
+class Book {
+    private String title;
+    private String author;
+    private String category;
+
+    public Book(String title, String author, String category) {
+        this.title = title;
+        this.author = author;
+        this.category = category;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    @Override
+    public String toString() {
+        return "Title: " + title + ", Author: " + author + ", Category: " + category;
+    }
+}
