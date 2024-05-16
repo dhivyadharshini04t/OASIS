@@ -1,125 +1,136 @@
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Scanner;
 
-public class Main {
-    private List<Book> books;
-    private Scanner scanner;
+public class OnlineReservationSystem {
+    public static void main(String[] args) {
+        LoginForm loginForm = new LoginForm();
+        ReservationSystem reservationSystem = new ReservationSystem();
+        Scanner scanner = new Scanner(System.in);
 
-    // Constructor for Main class
-    public Main() {
-        this.books = new ArrayList<>();
-        this.scanner = new Scanner(System.in);
-    }
+        System.out.println("Welcome to the Online Reservation System");
+        boolean loggedIn = false;
 
-    public void run() {
-        System.out.println("Welcome to Digital Library Management System!");
+        while (!loggedIn) {
+            System.out.print("Enter Username: ");
+            String username = scanner.nextLine();
+            System.out.print("Enter Password: ");
+            String password = scanner.nextLine();
+
+            if (loginForm.login(username, password)) {
+                loggedIn = true;
+                System.out.println("Login Successful!");
+            } else {
+                System.out.println("Invalid credentials, please try again.");
+            }
+        }
 
         while (true) {
-            System.out.println("\n1. Add Book");
-            System.out.println("2. Display All Books");
-            System.out.println("3. Search Book by Title");
-            System.out.println("4. Exit");
-            System.out.print("Enter your choice: ");
-
-            int choice = scanner.nextInt();
-            scanner.nextLine(); // Consume newline
+            System.out.println("\n1. Make a Reservation");
+            System.out.println("2. Cancel a Reservation");
+            System.out.println("3. Exit");
+            System.out.print("Choose an option: ");
+            int choice = Integer.parseInt(scanner.nextLine());
 
             switch (choice) {
                 case 1:
-                    addBook();
+                    System.out.print("Enter PNR: ");
+                    String pnr = scanner.nextLine();
+                    System.out.print("Enter Train Number: ");
+                    String trainNumber = scanner.nextLine();
+                    System.out.print("Enter Train Name: ");
+                    String trainName = scanner.nextLine();
+                    System.out.print("Enter Class Type: ");
+                    String classType = scanner.nextLine();
+                    System.out.print("Enter Date of Journey: ");
+                    String dateOfJourney = scanner.nextLine();
+                    System.out.print("Enter From: ");
+                    String from = scanner.nextLine();
+                    System.out.print("Enter To: ");
+                    String to = scanner.nextLine();
+
+                    reservationSystem.makeReservation(pnr, trainNumber, trainName, classType, dateOfJourney, from, to);
                     break;
+
                 case 2:
-                    displayAllBooks();
+                    System.out.print("Enter PNR to cancel: ");
+                    String cancelPnr = scanner.nextLine();
+                    Reservation reservation = reservationSystem.getReservation(cancelPnr);
+                    if (reservation != null) {
+                        System.out.println("Reservation Details: " + reservation);
+                        System.out.print("Confirm cancellation (yes/no): ");
+                        String confirm = scanner.nextLine();
+                        if (confirm.equalsIgnoreCase("yes")) {
+                            reservationSystem.cancelReservation(cancelPnr);
+                            System.out.println("Reservation cancelled successfully.");
+                        } else {
+                            System.out.println("Cancellation aborted.");
+                        }
+                    } else {
+                        System.out.println("Reservation not found.");
+                    }
                     break;
+
                 case 3:
-                    searchBookByTitle();
-                    break;
-                case 4:
-                    System.out.println("Exiting...");
+                    System.out.println("Exiting the system. Goodbye!");
                     scanner.close();
                     return;
+
                 default:
-                    System.out.println("Invalid choice. Please try again.");
+                    System.out.println("Invalid choice, please try again.");
             }
         }
-    }
-
-    private void addBook() {
-        System.out.print("Enter book title: ");
-        String title = scanner.nextLine();
-        System.out.print("Enter author name: ");
-        String author = scanner.nextLine();
-        System.out.print("Enter category: ");
-        String category = scanner.nextLine();
-
-        Book newBook = new Book(title, author, category);
-        books.add(newBook);
-
-        System.out.println("Book added successfully!");
-    }
-
-    private void displayAllBooks() {
-        if (books.isEmpty()) {
-            System.out.println("No books available in the library.");
-        } else {
-            System.out.println("List of Books:");
-            for (Book book : books) {
-                System.out.println(book);
-            }
-        }
-    }
-
-    private void searchBookByTitle() {
-        System.out.print("Enter book title to search: ");
-        String searchTitle = scanner.nextLine();
-
-        boolean found = false;
-        for (Book book : books) {
-            if (book.getTitle().equalsIgnoreCase(searchTitle)) {
-                System.out.println("Book found:");
-                System.out.println(book);
-                found = true;
-                break;
-            }
-        }
-
-        if (!found) {
-            System.out.println("Book with title '" + searchTitle + "' not found.");
-        }
-    }
-
-    public static void main(String[] args) {
-        Main librarySystem = new Main(); // Create an instance of Main class
-        librarySystem.run(); // Start the library system
     }
 }
 
-class Book {
-    private String title;
-    private String author;
-    private String category;
+class LoginForm {
+    private HashMap<String, String> users = new HashMap<>();
 
-    public Book(String title, String author, String category) {
-        this.title = title;
-        this.author = author;
-        this.category = category;
+    public LoginForm() {
+        // Predefined users
+        users.put("user1", "password1");
+        users.put("user2", "password2");
     }
 
-    public String getTitle() {
-        return title;
+    public boolean login(String username, String password) {
+        return users.containsKey(username) && users.get(username).equals(password);
+    }
+}
+
+class ReservationSystem {
+    private HashMap<String, Reservation> reservations = new HashMap<>();
+
+    public void makeReservation(String pnr, String trainNumber, String trainName, String classType, String dateOfJourney, String from, String to) {
+        Reservation reservation = new Reservation(pnr, trainNumber, trainName, classType, dateOfJourney, from, to);
+        reservations.put(pnr, reservation);
+        System.out.println("Reservation successful: " + reservation);
     }
 
-    public String getAuthor() {
-        return author;
+    public Reservation getReservation(String pnr) {
+        return reservations.get(pnr);
     }
 
-    public String getCategory() {
-        return category;
+    public void cancelReservation(String pnr) {
+        reservations.remove(pnr);
+    }
+}
+
+class Reservation {
+    String pnr, trainNumber, trainName, classType, dateOfJourney, from, to;
+
+    public Reservation(String pnr, String trainNumber, String trainName, String classType, String dateOfJourney, String from, String to) {
+        this.pnr = pnr;
+        this.trainNumber = trainNumber;
+        this.trainName = trainName;
+        this.classType = classType;
+        this.dateOfJourney = dateOfJourney;
+        this.from = from;
+        this.to = to;
     }
 
     @Override
     public String toString() {
-        return "Title: " + title + ", Author: " + author + ", Category: " + category;
+        return "PNR: " + pnr + ", Train Number: " + trainNumber + ", Train Name: " + trainName + 
+               ", Class Type: " + classType + ", Date of Journey: " + dateOfJourney + 
+               ", From: " + from + ", To: " + to;
     }
 }
